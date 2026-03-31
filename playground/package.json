@@ -1,5 +1,5 @@
 {
-  "name": "mihari-nuxtjs-playground",
+  "name": "mihari-logger-nuxtjs-playground",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,6 +10,6 @@
   },
   "devDependencies": {
     "nuxt": "^3.0.0",
-    "@mihari/nuxtjs": "link:.."
+    "@mihari/logger-nuxtjs": "link:.."
   }
 }

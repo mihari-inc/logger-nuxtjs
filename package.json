@@ -1,5 +1,5 @@
 {
-  "name": "@mihari/nuxtjs",
+  "name": "@mihari/logger-nuxtjs",
   "version": "0.1.0",
   "description": "Open-source log collection module for Nuxt 3 apps",
   "license": "MIT",

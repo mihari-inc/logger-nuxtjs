@@ -4,7 +4,7 @@ import type { MihariModuleOptions } from './runtime/types'
 
 export default defineNuxtModule<MihariModuleOptions>({
   meta: {
-    name: '@mihari/nuxtjs',
+    name: '@mihari/logger-nuxtjs',
     configKey: 'mihari',
     compatibility: {
       nuxt: '>=3.0.0',

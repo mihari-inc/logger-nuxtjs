@@ -1,4 +1,4 @@
-# @mihari/nuxtjs
+# @mihari/logger-nuxtjs
 
 Open-source log collection module for Nuxt 3 applications. Captures server-side request logs, client-side errors, and provides a composable logger for structured log ingestion.
 
@@ -17,11 +17,11 @@ Open-source log collection module for Nuxt 3 applications. Captures server-side 
 ### 1. Install
 
 ```bash
-npm install @mihari/nuxtjs
+npm install @mihari/logger-nuxtjs
 # or
-pnpm add @mihari/nuxtjs
+pnpm add @mihari/logger-nuxtjs
 # or
-yarn add @mihari/nuxtjs
+yarn add @mihari/logger-nuxtjs
 ```
 
 ### 2. Configure
@@ -30,7 +30,7 @@ Add the module to your `nuxt.config.ts`:
 
 ```ts
 export default defineNuxtConfig({
-  modules: ['@mihari/nuxtjs'],
+  modules: ['@mihari/logger-nuxtjs'],
   mihari: {
     token: process.env.MIHARI_TOKEN,
     endpoint: 'https://api.mihari.io/v1/logs',
@@ -82,7 +82,7 @@ The module reads these environment variables as fallbacks:
 
 ```ts
 export default defineNuxtConfig({
-  modules: ['@mihari/nuxtjs'],
+  modules: ['@mihari/logger-nuxtjs'],
   mihari: {
     token: process.env.MIHARI_TOKEN,
     endpoint: 'https://api.mihari.io/v1/logs',
