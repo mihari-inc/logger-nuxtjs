@@ -64,7 +64,10 @@ export class MihariTransport {
       try {
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.options.token}`,
+        }
+
+        if (this.options.token) {
+          headers['Authorization'] = `Bearer ${this.options.token}`
         }
 
         const fetchOptions: RequestInit = {

@@ -23,10 +23,15 @@ export default defineNuxtPlugin({
       return
     }
 
-    // Resolve token: server-side from private config, client-side from public
+    // Server-side: send directly to the remote endpoint with token
+    // Client-side: send to local Nitro proxy route (token stays server-side)
     const token = import.meta.server
       ? (config as unknown as { mihariToken: string }).mihariToken
       : ''
+
+    const endpoint = import.meta.server
+      ? publicConfig.endpoint
+      : '/api/_mihari/logs'
 
     const defaultMeta: Record<string, unknown> = {}
 
@@ -42,7 +47,7 @@ export default defineNuxtPlugin({
 
     const logger = createLogger({
       transport: {
-        endpoint: publicConfig.endpoint,
+        endpoint,
         token,
         batchSize: publicConfig.batchSize,
         flushInterval: publicConfig.flushInterval,

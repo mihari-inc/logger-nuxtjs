@@ -72,6 +72,13 @@ export default defineNuxtModule<MihariModuleOptions>({
       mode: 'all',
     })
 
+    // Register server proxy route for client-side log ingestion
+    addServerHandler({
+      route: '/api/_mihari/logs',
+      method: 'post',
+      handler: resolver.resolve('./runtime/server/api/logs.post'),
+    })
+
     // Register server middleware for request logging
     if (options.serverLogging) {
       addServerHandler({

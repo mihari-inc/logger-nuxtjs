@@ -1,9 +1,16 @@
 name: Release to npm
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   release:
@@ -17,9 +24,17 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
 
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - run: npm ci
 
       - run: npm run build
+
+      - name: Bump versions
+        run: npx lerna version ${{ inputs.bump }} --yes --no-private
 
       - run: npm publish
         env:

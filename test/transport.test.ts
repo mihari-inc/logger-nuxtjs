@@ -68,6 +68,22 @@ describe('MihariTransport', () => {
     transport.destroy()
   })
 
+  it('should omit Authorization header when token is empty', async () => {
+    const fetchMock = mockFetchOk()
+    globalThis.fetch = fetchMock as unknown as typeof fetch
+
+    const transport = new MihariTransport({ ...BASE_OPTIONS, token: '' })
+    transport.add(makeEntry({ message: 'no-auth' }))
+
+    await transport.flush()
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const [, options] = fetchMock.mock.calls[0]
+    expect(options.headers['Authorization']).toBeUndefined()
+    expect(options.headers['Content-Type']).toBe('application/json')
+    transport.destroy()
+  })
+
   it('should not flush when buffer is empty', async () => {
     const fetchMock = mockFetchOk()
     globalThis.fetch = fetchMock as unknown as typeof fetch

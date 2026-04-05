@@ -8,7 +8,7 @@ Open-source log collection module for Nuxt 3 applications. Captures server-side 
 - **Server middleware** for automatic HTTP request/response logging via Nitro
 - **Client error capture** with Vue error handler and unhandled error hooks
 - **Batched transport** with configurable batch size, flush interval, and exponential-backoff retry
-- **Runtime config** integration for secure token management
+- **Secure server-side proxy** for client logs — the token never leaves the server
 - **Auto-enrichment** of log entries with server metadata (hostname, pid) and client metadata (userAgent, route)
 - **TypeScript** support with full type definitions
 
@@ -161,7 +161,21 @@ Server logs are categorized by status code:
 - `4xx` -> `warn` level
 - `5xx` -> `error` level
 
-## Transport
+## Architecture
+
+### Client-side proxy
+
+Client-side logs are **not** sent directly to the remote endpoint. Instead, they go through a built-in Nitro server route (`/api/_mihari/logs`) that injects the Bearer token server-side before forwarding to the configured endpoint.
+
+```
+Browser  ──POST /api/_mihari/logs──▶  Nitro proxy  ──POST + Bearer token──▶  Remote API
+```
+
+This ensures the authentication token is **never exposed** in the client bundle or in browser network requests.
+
+Server-side logs (middleware, SSR) are sent directly to the remote endpoint with the token from `runtimeConfig`.
+
+### Transport
 
 The transport layer batches log entries and sends them via HTTP POST:
 
@@ -172,9 +186,14 @@ The transport layer batches log entries and sends them via HTTP POST:
 
 ### API Contract
 
-**Request**:
+**Request** (server-side / proxy to remote):
 - `POST` to configured endpoint
 - `Authorization: Bearer <token>`
+- `Content-Type: application/json`
+- Body: array of log entries
+
+**Request** (client-side to proxy):
+- `POST /api/_mihari/logs`
 - `Content-Type: application/json`
 - Body: array of log entries
 
