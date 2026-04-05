@@ -76,7 +76,7 @@ export default defineNuxtPlugin({
     // Client-side: capture current route in logs
     if (import.meta.client) {
       nuxtApp.hook('page:finish', () => {
-        const route = nuxtApp.$router?.currentRoute?.value
+        const route = (nuxtApp.$router as { currentRoute?: { value?: { fullPath: string } } } | undefined)?.currentRoute?.value
         if (route) {
           defaultMeta.route = route.fullPath
         }
