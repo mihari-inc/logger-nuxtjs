@@ -45,12 +45,18 @@ export default defineNuxtPlugin({
       defaultMeta.userAgent = globalThis.navigator?.userAgent
     }
 
+    // Disable flush timer during SSR to avoid Nuxt setInterval restriction.
+    // Server-side logs flush on batchSize threshold or explicit flush() calls.
+    // The dedicated server logger (logger.ts) runs outside the plugin lifecycle
+    // and handles its own flush timer.
+    const flushInterval = import.meta.server ? 0 : publicConfig.flushInterval
+
     const logger = createLogger({
       transport: {
         endpoint,
         token,
         batchSize: publicConfig.batchSize,
-        flushInterval: publicConfig.flushInterval,
+        flushInterval,
         maxRetries: publicConfig.maxRetries,
         retryDelay: publicConfig.retryDelay,
         gzip: publicConfig.gzip,

@@ -26,3 +26,11 @@ coverage/
 
 # Logs
 *.log
+
+playground/.env
+playground/pnpm-lock.yaml
+playground/node_modules/
+playground/.nuxt/
+playground/.output/
+playground/package-lock.json
+playground/yarn.lock
