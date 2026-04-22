@@ -24,31 +24,56 @@ export default defineNuxtModule<MihariModuleOptions>({
     clientErrorCapture: true,
   },
   setup(options, nuxt) {
-    if (!options.enabled) {
-      console.info('[mihari] Module is disabled')
+    const resolver = createResolver(import.meta.url)
+
+    const token = options.token || process.env.MIHARI_TOKEN || ''
+    const endpoint = options.endpoint || process.env.MIHARI_ENDPOINT || ''
+
+    // Auto-disable when the module is not fully configured.
+    // The runtime plugin and server logger no-op when `enabled === false`,
+    // so the module becomes silently transparent (no transport, no timers,
+    // no failed flush errors) — useful for CI builds without ingestion endpoint.
+    const enabled = (options.enabled ?? true) && Boolean(token) && Boolean(endpoint)
+
+    if (!enabled) {
+      nuxt.options.runtimeConfig = defu(nuxt.options.runtimeConfig, {
+        mihariToken: '',
+      })
+      nuxt.options.runtimeConfig.public = defu(nuxt.options.runtimeConfig.public, {
+        mihari: {
+          endpoint: '',
+          enabled: false,
+          batchSize: 0,
+          flushInterval: 0,
+          maxRetries: 0,
+          retryDelay: 0,
+          gzip: false,
+          logLevel: 'debug',
+          clientErrorCapture: false,
+        },
+      })
+      // Still register the plugin so `useLogger()` returns a no-op logger
+      // instead of throwing when the module is auto-disabled.
+      addImports({
+        name: 'useLogger',
+        as: 'useLogger',
+        from: resolver.resolve('./runtime/composables/useLogger'),
+      })
+      addPlugin({
+        src: resolver.resolve('./runtime/plugin'),
+        mode: 'all',
+      })
       return
     }
 
-    if (!options.token) {
-      console.warn('[mihari] No token configured. Set mihari.token in nuxt.config.ts or MIHARI_TOKEN env variable.')
-    }
-
-    if (!options.endpoint) {
-      console.warn('[mihari] No endpoint configured. Set mihari.endpoint in nuxt.config.ts or MIHARI_ENDPOINT env variable.')
-    }
-
-    const resolver = createResolver(import.meta.url)
-
-    // Inject runtime config
-    const token = options.token || process.env.MIHARI_TOKEN || ''
     nuxt.options.runtimeConfig = defu(nuxt.options.runtimeConfig, {
       mihariToken: token,
     })
 
     nuxt.options.runtimeConfig.public = defu(nuxt.options.runtimeConfig.public, {
       mihari: {
-        endpoint: options.endpoint || process.env.MIHARI_ENDPOINT || '',
-        enabled: options.enabled ?? true,
+        endpoint,
+        enabled: true,
         batchSize: options.batchSize ?? 10,
         flushInterval: options.flushInterval ?? 5000,
         maxRetries: options.maxRetries ?? 3,
