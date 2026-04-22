@@ -1,6 +1,6 @@
 {
   "name": "@mihari/logger-nuxtjs",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Open-source log collection module for Nuxt 3 apps",
   "license": "MIT",
   "publishConfig": {

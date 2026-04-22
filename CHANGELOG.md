@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/mihari-inc/logger-nuxtjs/compare/v0.1.2...v0.1.3) (2026-04-22)
+
+
+### Bug Fixes
+
+* get error in runtime into ci when not fully configured ([3eb3e23](https://github.com/mihari-inc/logger-nuxtjs/commit/3eb3e237c987df09d16e9d33cc0e8aa251daa7cb))
+
 ## [0.1.2](https://github.com/mihari-inc/logger-nuxtjs/compare/v0.1.1...v0.1.2) (2026-04-05)
 
 
