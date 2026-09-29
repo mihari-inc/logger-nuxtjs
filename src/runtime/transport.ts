@@ -1,8 +1,10 @@
-import type { LogEntry, TransportOptions, TransportResponse } from './types'
+import type { BufferedEntry, LogEntry, TransportOptions, TransportResponse } from './types'
+
+const MAX_FLUSH_ATTEMPTS = 3
 
 export class MihariTransport {
   private readonly options: TransportOptions
-  private buffer: readonly LogEntry[] = []
+  private buffer: readonly BufferedEntry[] = []
   private flushTimer: ReturnType<typeof setInterval> | null = null
   private isFlushing = false
 
@@ -12,7 +14,7 @@ export class MihariTransport {
   }
 
   add(entry: LogEntry): void {
-    this.buffer = [...this.buffer, entry]
+    this.buffer = [...this.buffer, { entry, flushAttempts: 0 }]
 
     if (this.buffer.length >= this.options.batchSize) {
       void this.flush()
@@ -25,15 +27,25 @@ export class MihariTransport {
     }
 
     this.isFlushing = true
-    const entries = this.buffer
+    const buffered = this.buffer
     this.buffer = []
+
+    const entries = buffered.map(b => b.entry)
 
     try {
       await this.send(entries)
     }
     catch (err) {
-      // Re-add failed entries to the front of the buffer for retry
-      this.buffer = [...entries, ...this.buffer]
+      const retryable = buffered
+        .map(b => ({ ...b, flushAttempts: b.flushAttempts + 1 }))
+        .filter(b => b.flushAttempts < MAX_FLUSH_ATTEMPTS)
+
+      const dropped = buffered.length - retryable.length
+      if (dropped > 0) {
+        console.warn(`[mihari] Dropped ${dropped} log(s) after ${MAX_FLUSH_ATTEMPTS} flush attempts`)
+      }
+
+      this.buffer = [...retryable, ...this.buffer]
       console.error('[mihari] Failed to flush logs:', err)
     }
     finally {

@@ -7,6 +7,11 @@ export interface LogEntry {
   readonly [key: string]: unknown
 }
 
+export interface BufferedEntry {
+  readonly entry: LogEntry
+  readonly flushAttempts: number
+}
+
 export interface MihariModuleOptions {
   /** Bearer token for API authentication */
   readonly token: string
